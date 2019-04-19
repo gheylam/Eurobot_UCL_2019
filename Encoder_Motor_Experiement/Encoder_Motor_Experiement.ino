@@ -31,8 +31,8 @@ void setup()
 
 void loop() 
 { 
-    MoveForward();
-  
+//    MoveForward();
+  Reverse(100, 100);
 }
 
 
@@ -159,4 +159,3 @@ void RotateCW()
 }
 
 //*********************************************************//
-
