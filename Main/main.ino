@@ -67,10 +67,14 @@ void turn_360_left(){
 
 void pivot_180(){
 	set_speed_forward(100, -100);
-	delay(4000); 
+	delay(1800); 
 	Stop();
 }
 
+void Stop(){
+  MyBoard.setMotor1Speed(128);
+  MyBoard.setMotor2Speed(128);
+}
 void set_speed_forward(int speed_left, int speed_right){
   
   //Make left spin first 
@@ -112,7 +116,7 @@ void setup() {
 }
 
 void loop() {
-  //sendSignal();
+  sendSignal();
   //delay(500);
   if (distLocation == LEFT){
     distOnLeft();
@@ -134,11 +138,15 @@ void distOnLeft(){
 void distOnRight(){
    turn_360_left();
     delay(1000);
+    //input fire IR signal
+    sendSignal();*/
     travel_dist(100, 250);
     delay(1000);
     //input fire IR signal
-	sendSignal();
+	  sendSignal();
     pivot_180(); 
     delay(1000);
+    //input fire IR signal
+    sendSignal();
     travel_dist(100,250);
 }
