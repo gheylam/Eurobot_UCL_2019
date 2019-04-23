@@ -7,7 +7,10 @@
 #include <IRLibCombo.h>   
 
 // Physics
-#define WHEEL_DIAM 50
+#define WD 100 
+#define CLICKS_PER_REV 347
+double circ = PI*WD; 
+
 
 MD25IIC MyBoard;
 IRsend mySender;
@@ -22,6 +25,61 @@ IRsend mySender;
 
 
 int distLocation;
+
+//MOTOR CONTROL FUNCTIONS =================================================
+unsigned long dist_to_clicks(int dist_mm){
+  double num_revs = dist_mm / circ; 
+  Serial.print("num_revs: ");
+  Serial.println(num_revs);
+  unsigned long clicks = round(CLICKS_PER_REV * num_revs);
+  return clicks;
+}
+
+void travel_dist(int speed_set, int dist_mm){
+   MyBoard.resetEncoders();
+   unsigned long clicks = dist_to_clicks(dist_mm); 
+   Serial.print("clicks: "); 
+   Serial.println(clicks);  
+   set_speed_forward(speed_set, speed_set);
+   while(abs(MyBoard.getMotor1Encoder()) < clicks){
+    Serial.println(MyBoard.getMotor1Encoder()); 
+   }
+   Stop();
+}
+
+void turn_90_left(){
+  set_speed_forward(100, -128); 
+  delay(1350); 
+  Stop();  
+}
+
+void turn_180_left(){ 
+  set_speed_forward(100, -128); 
+  delay(4000); 
+  Stop();
+}
+
+void turn_360_left(){
+  set_speed_forward(100, -128); 
+  delay(6600);
+  Stop();  
+}
+
+void pivot_180(){
+	set_speed_forward(100, -100);
+	delay(4000); 
+	Stop();
+}
+
+void set_speed_forward(int speed_left, int speed_right){
+  
+  //Make left spin first 
+  MyBoard.setMotor1Speed(-speed_left);
+  MyBoard.setMotor2Speed(128); 
+  delay(200); 
+  MyBoard.setMotor1Speed(-speed_left);
+  MyBoard.setMotor2Speed(-(speed_right+6));
+}
 
 
 // MAIN FUNCTIONS ==========================================================
@@ -54,15 +112,15 @@ void setup() {
 }
 
 void loop() {
-  sendSignal();
-  delay(500);
+  //sendSignal();
+  //delay(500);
   if (distLocation == LEFT){
     distOnLeft();
   
   
   }else if (distLocation == RIGHT){
     distOnRight();
-  
+	
   }
   
 }
@@ -74,4 +132,13 @@ void distOnLeft(){
 
 // Distributor on the right
 void distOnRight(){
+   turn_360_left();
+    delay(1000);
+    travel_dist(100, 250);
+    delay(1000);
+    //input fire IR signal
+	sendSignal();
+    pivot_180(); 
+    delay(1000);
+    travel_dist(100,250);
 }
