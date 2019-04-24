@@ -47,7 +47,6 @@ unsigned long dist_to_clicks(int dist_mm) {
   unsigned long clicks = round(CLICKS_PER_REV * num_revs);
   return clicks;
 }
-bool stop = false;
 
 void travel_dist(int speed_set, int dist_mm) {
   MyBoard.resetEncoders();
@@ -56,12 +55,7 @@ void travel_dist(int speed_set, int dist_mm) {
   Serial.println(clicks);
   set_speed_forward(speed_set+8, speed_set);
   while (abs(MyBoard.getMotor1Encoder()) < clicks) {
-    // Serial.println(MyBoard.getMotor1Encoder());
-    int val = analogRead(A5);
-    Serial.println(val);
-    // if (val > 1005){
-    //   break;
-    // }
+    Serial.println(MyBoard.getMotor1Encoder());
   }
   Stop();
 }
@@ -158,7 +152,6 @@ void sendSignal() {
 void setup() {
   pinMode(TURN_ON_PIN, INPUT_PULLUP);
   pinMode(MAP_SIDE_PIN, INPUT_PULLUP);
-  pinMode(A5, INPUT);
 
   //Set up the LED pins
   pinMode(LED_1, OUTPUT);
@@ -221,12 +214,11 @@ void loop() {
 
 // Distributor on the left
 void distOnLeft() {
-  // turn_180_right();
+  turn_180_right();
   travel_dist(100, 600);
-  if (stop == false){
-    turn_180_right();
-    travel_dist(100, 600);
-  }
+  turn_180_right();
+  travel_dist(100, 600);
+
   // turn_360_right();
   // delay(1000);
   //input fire IR signal
@@ -243,12 +235,11 @@ void distOnLeft() {
 
 // Distributor on the right
 void distOnRight() {
-  // turn_180_left();
+  turn_180_left();
   travel_dist(100, 600);
-  if (stop == false){
-    turn_180_left();
-    travel_dist(100, 600);
-  }
+  turn_180_left();
+  travel_dist(100, 600);
+
   // turn_360_left();
   // delay(1000);
   // //input fire IR signal
