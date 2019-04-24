@@ -23,6 +23,19 @@ IRsend mySender;
 #define LEFT 0
 #define RIGHT 1
 
+//BLUE LED Pins 
+#define LED_1 24
+#define LED_2 26
+#define LED_3 28
+#define LED_4 29
+#define LED_5 32
+#define LED_6 34
+#define LED_7 36
+#define LED_8 38
+#define LED_9 40
+#define LED_10 42
+
+
 
 int distLocation;
 
@@ -61,7 +74,7 @@ void turn_180_left(){
 
 void turn_360_left(){
   set_speed_forward(100, -128); 
-  delay(6600);
+  delay(6900);
   Stop();  
 }
 
@@ -89,13 +102,68 @@ void set_speed_forward(int speed_left, int speed_right){
 // MAIN FUNCTIONS ==========================================================
 
 void sendSignal(){
+  //Rev up the LEDs! 
+  digitalWrite(LED_10, HIGH);
+  delay(200);
+  digitalWrite(LED_9, HIGH);
+  delay(200);
+  digitalWrite(LED_8, HIGH);
+  delay(200);
+  digitalWrite(LED_7, HIGH);
+  delay(200);
+  digitalWrite(LED_6, HIGH);
+  delay(200);
+  digitalWrite(LED_5, HIGH);
+  delay(200);
+  digitalWrite(LED_4, HIGH);
+  delay(200);
+  digitalWrite(LED_3, HIGH);
+  delay(200);
+  digitalWrite(LED_2, HIGH);
+  delay(200);
+  digitalWrite(LED_1, HIGH);
+  delay(200);
   mySender.send(SONY,0xa8bca, 20);
+  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_2, LOW);
+  digitalWrite(LED_3, LOW);
+  digitalWrite(LED_4, LOW);
+  digitalWrite(LED_5, LOW);
+  digitalWrite(LED_6, LOW);
+  digitalWrite(LED_7, LOW);
+  digitalWrite(LED_8, LOW);
+  digitalWrite(LED_9, LOW);
+  digitalWrite(LED_10, LOW);
+  
 }
 
 void setup() {
   pinMode(TURN_ON_PIN, INPUT_PULLUP);
   pinMode(MAP_SIDE_PIN, INPUT_PULLUP);
 
+  //Set up the LED pins 
+  pinMode(LED_1, OUTPUT);
+  pinMode(LED_2, OUTPUT);
+  pinMode(LED_3, OUTPUT);
+  pinMode(LED_4, OUTPUT);
+  pinMode(LED_5, OUTPUT);
+  pinMode(LED_6, OUTPUT);
+  pinMode(LED_7, OUTPUT);
+  pinMode(LED_8, OUTPUT);
+  pinMode(LED_9, OUTPUT);
+  pinMode(LED_10, OUTPUT);
+  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_2, LOW);
+  digitalWrite(LED_3, LOW);
+  digitalWrite(LED_4, LOW);
+  digitalWrite(LED_5, LOW);
+  digitalWrite(LED_6, LOW);
+  digitalWrite(LED_7, LOW);
+  digitalWrite(LED_8, LOW);
+  digitalWrite(LED_9, LOW);
+  digitalWrite(LED_10, LOW);
+  sendSignal();
+  
   while (digitalRead(TURN_ON_PIN) == LOW);
 
   Serial.begin(9600);
@@ -115,16 +183,18 @@ void setup() {
 
 }
 
+char should_i_stop = 'n'; 
+
 void loop() {
   sendSignal();
-  //delay(500);
-  if (distLocation == LEFT){
-    distOnLeft();
-  
-  
-  }else if (distLocation == RIGHT){
-    distOnRight();
-	
+  if(should_i_stop != 'y'){
+    if (distLocation == LEFT){
+      distOnLeft();
+      should_i_stop = 'y';
+    }else if (distLocation == RIGHT){
+      distOnRight();
+      should_i_stop = 'y'; 
+   }
   }
   
 }
@@ -139,7 +209,7 @@ void distOnRight(){
    turn_360_left();
     delay(1000);
     //input fire IR signal
-    sendSignal();*/
+    sendSignal();
     travel_dist(100, 250);
     delay(1000);
     //input fire IR signal
@@ -148,5 +218,5 @@ void distOnRight(){
     delay(1000);
     //input fire IR signal
     sendSignal();
-    travel_dist(100,250);
+    travel_dist(100,400);
 }

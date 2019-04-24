@@ -21,19 +21,97 @@ MD25IIC MyBoard;
 // Setup function
 //**************************************************************/
 
+#define WD 100 
+#define CLICKS_PER_REV 347
+double circ = PI*WD; 
+
+unsigned long dist_to_clicks(int dist_mm){
+  double num_revs = dist_mm / circ; 
+  Serial.print("num_revs: ");
+  Serial.println(num_revs);
+  unsigned long clicks = round(CLICKS_PER_REV * num_revs);
+  return clicks;
+}
+
+void travel_dist(int speed_set, int dist_mm){
+   MyBoard.resetEncoders();
+   unsigned long clicks = dist_to_clicks(dist_mm); 
+   Serial.print("clicks: "); 
+   Serial.println(clicks);  
+   set_speed_forward(speed_set, speed_set);
+   while(abs(MyBoard.getMotor1Encoder()) < clicks){
+    Serial.println(MyBoard.getMotor1Encoder()); 
+   }
+   Stop();
+}
+
+void turn_90_left(){
+  set_speed_forward(100, -128); 
+  delay(1350); 
+  Stop();  
+}
+
+void turn_180_left(){ 
+  set_speed_forward(100, -128); 
+  delay(3300); 
+  Stop();
+}
+
+void turn_360_left(){
+  set_speed_forward(100, -128); 
+  delay(6600);
+  Stop();  
+}
+
+
+void pivot_180(){
+  set_speed_forward(100, -100); 
+  delay(1800); 
+  Stop();
+}
+
+
+
+void accelerate(int speed_left, int speed_right){
+  for(int increment = 0; increment < 11; increment++){
+    int speed_left_val = map(increment, 0, 10, 0, speed_left); 
+    int speed_right_val = map(increment, 0, 10, 0, speed_right); 
+    set_speed_forward(speed_left_val, speed_right_val);
+    delay(50);
+  }
+}
+
+void set_speed_forward(int speed_left, int speed_right){
+  
+  //Make left spin first 
+  MyBoard.setMotor1Speed(-speed_left);
+  MyBoard.setMotor2Speed(128); 
+  delay(200); 
+  MyBoard.setMotor1Speed(-speed_left);
+  MyBoard.setMotor2Speed(-(speed_right+6));
+}
+
+
 void setup()
 {
     Serial.begin(115200);           // Set Serial Port to 115200 bps
     MyBoard.enableTimeOut(false);    // Stop motor if no command sent
     MyBoard.enableController(true); // Enable On-board speed controller
     MyBoard.resetEncoders();        // Reset (both) encoders to 0000 
-}    
+    //travel_dist(50, 1000);
+    //left motor 
+    //set_speed_forward(60, 60);
+    
+}
 
 void loop() 
 { 
-//    MoveForward();
-  Reverse(100, 100);
+//  MoveForward();
+    pivot_180(); 
+    delay(1000);
 }
+
+
 
 
 //**********************************************************//
